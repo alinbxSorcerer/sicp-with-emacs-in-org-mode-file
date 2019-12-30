@@ -1,0 +1,828 @@
+[[#pagetop][⇡]]<<pagetop>><<g_t1_002e3>>
+Next: [[file:Chapter-2.xhtml#Chapter-2][Chapter 2]], Prev: [[file:1_002e2.xhtml#g_t1_002e2][1.2]], Up: [[file:Chapter-1.xhtml#Chapter-1][Chapter 1]]   [[[file:index.xhtml#SEC_Contents][Contents]]]
+
+<<Formulating-Abstractions-with-Higher_002dOrder-Procedures>>
+*** 1.3Formulating Abstractions with Higher-Order Procedures
+    :PROPERTIES:
+    :CUSTOM_ID: formulating-abstractions-with-higher-order-procedures
+    :CLASS: section
+    :END:
+
+We have seen that procedures are, in effect, abstractions that describe compound operations on numbers independent of the particular numbers. For example, when we
+
+#+BEGIN_SRC lisp
+    (define (cube x) (* x x x))
+#+END_SRC
+
+we are not talking about the cube of a particular number, but rather about a method for obtaining the cube of any number. Of course we could get along without ever defining this procedure, by always writing expressions such as
+
+#+BEGIN_SRC lisp
+    (* 3 3 3)
+    (* x x x)
+    (* y y y)
+#+END_SRC
+
+and never mentioning =cube= explicitly. This would place us at a serious disadvantage, forcing us to work always at the level of the particular operations that happen to be primitives in the language (multiplication, in this case) rather than in terms of higher-level operations. Our programs would be able to compute cubes, but our language would lack the ability to express the concept of cubing. One of the things we should demand from a powerful programming language is the ability to build abstractions by assigning names to common patterns and then to work in terms of the abstractions directly. Procedures provide this ability. This is why all but the most primitive programming languages include mechanisms for defining procedures.
+
+Yet even in numerical processing we will be severely limited in our ability to create abstractions if we are restricted to procedures whose parameters must be numbers. Often the same programming pattern will be used with a number of different procedures. To express such patterns as concepts, we will need to construct procedures that can accept procedures as arguments or return procedures as values. Procedures that manipulate procedures are called <<index-higher_002dorder-procedures>> /higher-order procedures/. This section shows how higher-order procedures can serve as powerful abstraction mechanisms, vastly increasing the expressive power of our language.
+
+<<g_t1_002e3_002e1>> <<Procedures-as-Arguments>>
+**** 1.3.1Procedures as Arguments
+     :PROPERTIES:
+     :CUSTOM_ID: procedures-as-arguments
+     :CLASS: subsection
+     :END:
+
+Consider the following three procedures. The first computes the sum of the integers from =a= through =b=:
+
+#+BEGIN_SRC lisp
+    (define (sum-integers a b)
+      (if (> a b) 
+          0 
+          (+ a (sum-integers (+ a 1) b))))
+#+END_SRC
+
+The second computes the sum of the cubes of the integers in the given range:
+
+#+BEGIN_SRC lisp
+    (define (sum-cubes a b)
+      (if (> a b) 
+          0 
+          (+ (cube a) 
+             (sum-cubes (+ a 1) b))))
+#+END_SRC
+
+The third computes the sum of a sequence of terms in the series [[file:fig/math/f316427b55b2cae99386cc31549fae9d.svg]] which converges to [[file:fig/math/7036f8c43b937dd94b8729faff8921d8.svg]] (very slowly):^{[[#FOOT49][49]]}
+
+#+BEGIN_SRC lisp
+    (define (pi-sum a b)
+      (if (> a b)
+          0
+          (+ (/ 1.0 (* a (+ a 2))) 
+             (pi-sum (+ a 4) b))))
+#+END_SRC
+
+These three procedures clearly share a common underlying pattern. They are for the most part identical, differing only in the name of the procedure, the function of =a= used to compute the term to be added, and the function that provides the next value of =a=. We could generate each of the procedures by filling in slots in the same template:
+
+#+BEGIN_SRC lisp
+    (define (⟨name⟩ a b)
+      (if (> a b)
+          0
+          (+ (⟨term⟩ a) 
+             (⟨name⟩ (⟨next⟩ a) b))))
+#+END_SRC
+
+The presence of such a common pattern is strong evidence that there is a useful abstraction waiting to be brought to the surface. Indeed, mathematicians long ago identified the abstraction of <<index-summation-of-a-series>> /summation of a series/ and invented “sigma notation,” for example [[file:fig/math/0eb2995b6eef64f53cec0011a7a1bf0a.svg]] to express this concept. The power of sigma notation is that it allows mathematicians to deal with the concept of summation itself rather than only with particular sums---for example, to formulate general results about sums that are independent of the particular series being summed.
+
+Similarly, as program designers, we would like our language to be powerful enough so that we can write a procedure that expresses the concept of summation itself rather than only procedures that compute particular sums. We can do so readily in our procedural language by taking the common template shown above and transforming the “slots” into formal parameters:
+
+#+BEGIN_SRC lisp
+    (define (sum term a next b)
+      (if (> a b)
+          0
+          (+ (term a)
+             (sum term (next a) next b))))
+#+END_SRC
+
+Notice that =sum= takes as its arguments the lower and upper bounds =a= and =b= together with the procedures =term= and =next=. We can use =sum= just as we would any procedure. For example, we can use it (along with a procedure =inc= that increments its argument by 1) to define =sum-cubes=:
+
+#+BEGIN_SRC lisp
+    (define (inc n) (+ n 1))
+
+    (define (sum-cubes a b)
+      (sum cube a inc b))
+#+END_SRC
+
+Using this, we can compute the sum of the cubes of the integers from 1 to 10:
+
+#+BEGIN_SRC lisp
+    (sum-cubes 1 10)
+    3025
+#+END_SRC
+
+With the aid of an identity procedure to compute the term, we can define =sum-integers= in terms of =sum=:
+
+#+BEGIN_SRC lisp
+    (define (identity x) x)
+
+    (define (sum-integers a b)
+      (sum identity a inc b))
+#+END_SRC
+
+Then we can add up the integers from 1 to 10:
+
+#+BEGIN_SRC lisp
+    (sum-integers 1 10)
+    55
+#+END_SRC
+
+We can also define =pi-sum= in the same way:^{[[#FOOT50][50]]}
+
+#+BEGIN_SRC lisp
+    (define (pi-sum a b)
+      (define (pi-term x)
+        (/ 1.0 (* x (+ x 2))))
+      (define (pi-next x)
+        (+ x 4))
+      (sum pi-term a pi-next b))
+#+END_SRC
+
+Using these procedures, we can compute an approximation to [[file:fig/math/c25469cd205e957b38b51203870f48af.svg]]:
+
+#+BEGIN_SRC lisp
+    (* 8 (pi-sum 1 1000))
+    3.139592655589783
+#+END_SRC
+
+Once we have =sum=, we can use it as a building block in formulating further concepts. For instance, the definite integral of a function [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] between the limits [[file:fig/math/09009cdd5fc245e05305bc574dcdc97d.svg]] and [[file:fig/math/3e92f417ccfc1f59b0ee22d034c85747.svg]] can be approximated numerically using the formula [[file:fig/math/86184e563a55746a1b5c8780393ed522.svg]] for small values of [[file:fig/math/a999758b4fd8ccd10d6eda8234629d51.svg]]. We can express this directly as a procedure:
+
+#+BEGIN_SRC lisp
+    (define (integral f a b dx)
+      (define (add-dx x) (+ x dx))
+      (* (sum f (+ a (/ dx 2.0)) add-dx b) 
+         dx))
+
+    (integral cube 0 1 0.01)
+    .24998750000000042
+
+    (integral cube 0 1 0.001)
+    .249999875000001
+#+END_SRC
+
+(The exact value of the integral of =cube= between 0 and 1 is 1/4.)
+
+#+BEGIN_QUOTE
+  *<<Exercise-1_002e29>>Exercise 1.29:* Simpson's Rule is a more accurate method of numerical integration than the method illustrated above. Using Simpson's Rule, the integral of a function [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] between [[file:fig/math/09009cdd5fc245e05305bc574dcdc97d.svg]] and [[file:fig/math/3e92f417ccfc1f59b0ee22d034c85747.svg]] is approximated as [[file:fig/math/70b79a35895e03d4b7cc28af18f33f90.svg]] where [[file:fig/math/f332fb41588030f2e0de99b4c5635ece.svg]], for some even integer [[file:fig/math/0932467390da34555ec70c122d7e915e.svg]], and [[file:fig/math/43c753cbc8190f8b7514dfaf32a74cbb.svg]]. (Increasing [[file:fig/math/0932467390da34555ec70c122d7e915e.svg]] increases the accuracy of the approximation.) Define a procedure that takes as arguments [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]], [[file:fig/math/09009cdd5fc245e05305bc574dcdc97d.svg]], [[file:fig/math/3e92f417ccfc1f59b0ee22d034c85747.svg]], and [[file:fig/math/0932467390da34555ec70c122d7e915e.svg]] and returns the value of the integral, computed using Simpson's Rule. Use your procedure to integrate =cube= between 0 and 1 (with [[file:fig/math/c2a31743664bc36d2792884a3692b1f5.svg]] and [[file:fig/math/21e6a0a663b7bb714ef3eded3affb64d.svg]]), and compare the results to those of the =integral= procedure shown above.
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+  *<<Exercise-1_002e30>>Exercise 1.30:* The =sum= procedure above generates a linear recursion. The procedure can be rewritten so that the sum is performed iteratively. Show how to do this by filling in the missing expressions in the following definition:
+
+  #+BEGIN_SRC lisp
+      (define (sum term a next b)
+        (define (iter a result)
+          (if ⟨??⟩
+              ⟨??⟩
+              (iter ⟨??⟩ ⟨??⟩)))
+        (iter ⟨??⟩ ⟨??⟩))
+  #+END_SRC
+
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+  *<<Exercise-1_002e31>>Exercise 1.31:*
+
+  1. The =sum= procedure is only the simplest of a vast number of similar abstractions that can be captured as higher-order procedures.^{[[#FOOT51][51]]} Write an analogous procedure called =product= that returns the product of the values of a function at points over a given range. Show how to define =factorial= in terms of =product=. Also use =product= to compute approximations to [[file:fig/math/c25469cd205e957b38b51203870f48af.svg]] using the formula^{[[#FOOT52][52]]} [[file:fig/math/8e07cb198382e08868967e370efa5f84.svg]]
+  2. If your =product= procedure generates a recursive process, write one that generates an iterative process. If it generates an iterative process, write one that generates a recursive process.
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+  *<<Exercise-1_002e32>>Exercise 1.32:*
+
+  1. Show that =sum= and =product= ([[#Exercise-1_002e31][Exercise 1.31]]) are both special cases of a still more general notion called =accumulate= that combines a collection of terms, using some general accumulation function:
+
+     #+BEGIN_SRC lisp
+         (accumulate 
+          combiner null-value term a next b)
+     #+END_SRC
+
+     =Accumulate= takes as arguments the same term and range specifications as =sum= and =product=, together with a =combiner= procedure (of two arguments) that specifies how the current term is to be combined with the accumulation of the preceding terms and a =null-value= that specifies what base value to use when the terms run out. Write =accumulate= and show how =sum= and =product= can both be defined as simple calls to =accumulate=.
+
+  2. If your =accumulate= procedure generates a recursive process, write one that generates an iterative process. If it generates an iterative process, write one that generates a recursive process.
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+  *<<Exercise-1_002e33>>Exercise 1.33:* You can obtain an even more general version of =accumulate= ([[#Exercise-1_002e32][Exercise 1.32]]) by introducing the notion of a <<index-filter>> /filter/ on the terms to be combined. That is, combine only those terms derived from values in the range that satisfy a specified condition. The resulting =filtered-accumulate= abstraction takes the same arguments as accumulate, together with an additional predicate of one argument that specifies the filter. Write =filtered-accumulate= as a procedure. Show how to express the following using =filtered-accumulate=:
+
+  1. the sum of the squares of the prime numbers in the interval [[file:fig/math/09009cdd5fc245e05305bc574dcdc97d.svg]] to [[file:fig/math/3e92f417ccfc1f59b0ee22d034c85747.svg]] (assuming that you have a =prime?= predicate already written)
+  2. the product of all the positive integers less than [[file:fig/math/0932467390da34555ec70c122d7e915e.svg]] that are relatively prime to [[file:fig/math/0932467390da34555ec70c122d7e915e.svg]] (i.e., all positive integers [[file:fig/math/9ab46f9df27bbac5cdde0d8abca405eb.svg]] such that [[file:fig/math/10a7615c5fa63cfa8614ad9a685f9b49.svg]]).
+#+END_QUOTE
+
+<<g_t1_002e3_002e2>> <<Constructing-Procedures-Using-Lambda>>
+**** 1.3.2Constructing Procedures Using =Lambda=
+     :PROPERTIES:
+     :CUSTOM_ID: constructing-procedures-using-lambda
+     :CLASS: subsection
+     :END:
+
+In using =sum= as in [[#g_t1_002e3_002e1][1.3.1]], it seems terribly awkward to have to define trivial procedures such as =pi-term= and =pi-next= just so we can use them as arguments to our higher-order procedure. Rather than define =pi-next= and =pi-term=, it would be more convenient to have a way to directly specify “the procedure that returns its input incremented by 4” and “the procedure that returns the reciprocal of its input times its input plus 2.” We can do this by introducing the special form =lambda=, which creates procedures. Using =lambda= we can describe what we want as
+
+#+BEGIN_SRC lisp
+    (lambda (x) (+ x 4))
+#+END_SRC
+
+and
+
+#+BEGIN_SRC lisp
+    (lambda (x) (/ 1.0 (* x (+ x 2))))
+#+END_SRC
+
+Then our =pi-sum= procedure can be expressed without defining any auxiliary procedures as
+
+#+BEGIN_SRC lisp
+    (define (pi-sum a b)
+      (sum (lambda (x) (/ 1.0 (* x (+ x 2))))
+           a
+           (lambda (x) (+ x 4))
+           b))
+#+END_SRC
+
+Again using =lambda=, we can write the =integral= procedure without having to define the auxiliary procedure =add-dx=:
+
+#+BEGIN_SRC lisp
+    (define (integral f a b dx)
+      (* (sum f (+ a (/ dx 2.0))
+                (lambda (x) (+ x dx))
+                b)
+         dx))
+#+END_SRC
+
+In general, =lambda= is used to create procedures in the same way as =define=, except that no name is specified for the procedure:
+
+#+BEGIN_SRC lisp
+    (lambda (⟨formal-parameters⟩) ⟨body⟩)
+#+END_SRC
+
+The resulting procedure is just as much a procedure as one that is created using =define=. The only difference is that it has not been associated with any name in the environment. In fact,
+
+#+BEGIN_SRC lisp
+    (define (plus4 x) (+ x 4))
+#+END_SRC
+
+is equivalent to
+
+#+BEGIN_SRC lisp
+    (define plus4 (lambda (x) (+ x 4)))
+#+END_SRC
+
+We can read a =lambda= expression as follows:
+
+#+BEGIN_EXAMPLE
+    (lambda                     (x)     (+   x     4))
+        |                        |       |   |     |
+    the procedure of an argument x that adds x and 4
+#+END_EXAMPLE
+
+Like any expression that has a procedure as its value, a =lambda= expression can be used as the operator in a combination such as
+
+#+BEGIN_SRC lisp
+    ((lambda (x y z) (+ x y (square z))) 1 2 3)
+    12
+#+END_SRC
+
+or, more generally, in any context where we would normally use a procedure name.^{[[#FOOT53][53]]}
+
+<<Using-let-to-create-local-variables>>
+***** Using =let= to create local variables
+      :PROPERTIES:
+      :CUSTOM_ID: using-let-to-create-local-variables
+      :CLASS: subsubheading
+      :END:
+
+Another use of =lambda= is in creating local variables. We often need local variables in our procedures other than those that have been bound as formal parameters. For example, suppose we wish to compute the function [[file:fig/math/fe77b247f1b571631311f5e0e0a8559d.svg]] which we could also express as [[file:fig/math/19531eed609e9a8dd489a1e7f8434630.svg]] In writing a procedure to compute [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]], we would like to include as local variables not only [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]] and [[file:fig/math/05e4cdb2f26a4f66b68c167423907fea.svg]] but also the names of intermediate quantities like [[file:fig/math/09009cdd5fc245e05305bc574dcdc97d.svg]] and [[file:fig/math/3e92f417ccfc1f59b0ee22d034c85747.svg]]. One way to accomplish this is to use an auxiliary procedure to bind the local variables:
+
+#+BEGIN_SRC lisp
+    (define (f x y)
+      (define (f-helper a b)
+        (+ (* x (square a))
+           (* y b)
+           (* a b)))
+      (f-helper (+ 1 (* x y)) 
+                (- 1 y)))
+#+END_SRC
+
+Of course, we could use a =lambda= expression to specify an anonymous procedure for binding our local variables. The body of =f= then becomes a single call to that procedure:
+
+#+BEGIN_SRC lisp
+    (define (f x y)
+      ((lambda (a b)
+         (+ (* x (square a)) 
+            (* y b) 
+            (* a b)))
+       (+ 1 (* x y))
+       (- 1 y)))
+#+END_SRC
+
+This construct is so useful that there is a special form called =let= to make its use more convenient. Using =let=, the =f= procedure could be written as
+
+#+BEGIN_SRC lisp
+    (define (f x y)
+      (let ((a (+ 1 (* x y)))
+            (b (- 1 y)))
+        (+ (* x (square a))
+           (* y b)
+           (* a b))))
+#+END_SRC
+
+The general form of a =let= expression is
+
+#+BEGIN_SRC lisp
+    (let ((⟨var₁⟩ ⟨exp₁⟩)
+          (⟨var₂⟩ ⟨exp₂⟩)
+          …
+          (⟨varₙ⟩ ⟨expₙ⟩))
+      ⟨body⟩)
+#+END_SRC
+
+which can be thought of as saying
+
+#+BEGIN_EXAMPLE
+    let ⟨var₁⟩ have the value ⟨exp₁⟩ and
+        ⟨var₂⟩ have the value ⟨exp₂⟩ and
+        …
+        ⟨varₙ⟩ have the value ⟨expₙ⟩
+      in ⟨body⟩
+#+END_EXAMPLE
+
+The first part of the =let= expression is a list of name-expression pairs. When the =let= is evaluated, each name is associated with the value of the corresponding expression. The body of the =let= is evaluated with these names bound as local variables. The way this happens is that the =let= expression is interpreted as an alternate syntax for
+
+#+BEGIN_SRC lisp
+    ((lambda (⟨var₁⟩ … ⟨varₙ⟩)
+       ⟨body⟩)
+     ⟨exp₁⟩
+     …
+     ⟨expₙ⟩)
+#+END_SRC
+
+No new mechanism is required in the interpreter in order to provide local variables. A =let= expression is simply syntactic sugar for the underlying =lambda= application.
+
+We can see from this equivalence that the scope of a variable specified by a =let= expression is the body of the =let=. This implies that:
+
+- =Let= allows one to bind variables as locally as possible to where they are to be used. For example, if the value of =x= is 5, the value of the expression
+
+  #+BEGIN_SRC lisp
+      (+ (let ((x 3))
+           (+ x (* x 10)))
+         x)
+  #+END_SRC
+
+  is 38. Here, the =x= in the body of the =let= is 3, so the value of the =let= expression is 33. On the other hand, the =x= that is the second argument to the outermost =+= is still 5.
+
+- The variables' values are computed outside the =let=. This matters when the expressions that provide the values for the local variables depend upon variables having the same names as the local variables themselves. For example, if the value of =x= is 2, the expression
+
+  #+BEGIN_SRC lisp
+      (let ((x 3)
+            (y (+ x 2)))
+        (* x y))
+  #+END_SRC
+
+  will have the value 12 because, inside the body of the =let=, =x= will be 3 and =y= will be 4 (which is the outer =x= plus 2).
+
+Sometimes we can use internal definitions to get the same effect as with =let=. For example, we could have defined the procedure =f= above as
+
+#+BEGIN_SRC lisp
+    (define (f x y)
+      (define a 
+        (+ 1 (* x y)))
+      (define b (- 1 y))
+      (+ (* x (square a))
+         (* y b)
+         (* a b)))
+#+END_SRC
+
+We prefer, however, to use =let= in situations like this and to use internal =define= only for internal procedures.^{[[#FOOT54][54]]}
+
+#+BEGIN_QUOTE
+  *<<Exercise-1_002e34>>Exercise 1.34:* Suppose we define the procedure
+
+  #+BEGIN_SRC lisp
+      (define (f g) (g 2))
+  #+END_SRC
+
+  Then we have
+
+  #+BEGIN_SRC lisp
+      (f square)
+      4
+
+      (f (lambda (z) (* z (+ z 1))))
+      6
+  #+END_SRC
+
+  What happens if we (perversely) ask the interpreter to evaluate the combination =(f f)=? Explain.
+#+END_QUOTE
+
+<<g_t1_002e3_002e3>> <<Procedures-as-General-Methods>>
+**** 1.3.3Procedures as General Methods
+     :PROPERTIES:
+     :CUSTOM_ID: procedures-as-general-methods
+     :CLASS: subsection
+     :END:
+
+We introduced compound procedures in [[file:1_002e1.xhtml#g_t1_002e1_002e4][1.1.4]] as a mechanism for abstracting patterns of numerical operations so as to make them independent of the particular numbers involved. With higher-order procedures, such as the =integral= procedure of [[#g_t1_002e3_002e1][1.3.1]], we began to see a more powerful kind of abstraction: procedures used to express general methods of computation, independent of the particular functions involved. In this section we discuss two more elaborate examples---general methods for finding zeros and fixed points of functions---and show how these methods can be expressed directly as procedures.
+
+<<Finding-roots-of-equations-by-the-half_002dinterval-method>>
+***** Finding roots of equations by the half-interval method
+      :PROPERTIES:
+      :CUSTOM_ID: finding-roots-of-equations-by-the-half-interval-method
+      :CLASS: subsubheading
+      :END:
+
+The <<index-half_002dinterval-method>> /half-interval method/ is a simple but powerful technique for finding roots of an equation [[file:fig/math/21b19556ea4f8df5b5bdbfea09d37ce1.svg]], where [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] is a continuous function. The idea is that, if we are given points [[file:fig/math/09009cdd5fc245e05305bc574dcdc97d.svg]] and [[file:fig/math/3e92f417ccfc1f59b0ee22d034c85747.svg]] such that [[file:fig/math/2ebbda41ddf9bbce8a5cf027170ce10d.svg]], then [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] must have at least one zero between [[file:fig/math/09009cdd5fc245e05305bc574dcdc97d.svg]] and [[file:fig/math/3e92f417ccfc1f59b0ee22d034c85747.svg]]. To locate a zero, let [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]] be the average of [[file:fig/math/09009cdd5fc245e05305bc574dcdc97d.svg]] and [[file:fig/math/3e92f417ccfc1f59b0ee22d034c85747.svg]], and compute [[file:fig/math/b057a8e52b609c9d7031fbe3992972ef.svg]]. If [[file:fig/math/45a3fd031ce7e15eac4c6477cdc6a3a1.svg]], then [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] must have a zero between [[file:fig/math/09009cdd5fc245e05305bc574dcdc97d.svg]] and [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]]. If [[file:fig/math/7f0eaa927815e7643164bd4538441b42.svg]], then [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] must have a zero between [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]] and [[file:fig/math/3e92f417ccfc1f59b0ee22d034c85747.svg]]. Continuing in this way, we can identify smaller and smaller intervals on which [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] must have a zero. When we reach a point where the interval is small enough, the process stops. Since the interval of uncertainty is reduced by half at each step of the process, the number of steps required grows as [[file:fig/math/0965cc2fcc7d9b8980211f23a76a1ee5.svg]], where [[file:fig/math/a23a2cd0225c802f8f86942524b01811.svg]] is the length of the original interval and [[file:fig/math/f06926aab0bc0e9f47ee2cd90f581bb2.svg]] is the error tolerance (that is, the size of the interval we will consider “small enough”). Here is a procedure that implements this strategy:
+
+#+BEGIN_SRC lisp
+    (define (search f neg-point pos-point)
+      (let ((midpoint 
+             (average neg-point pos-point)))
+        (if (close-enough? neg-point pos-point)
+            midpoint
+            (let ((test-value (f midpoint)))
+              (cond 
+               ((positive? test-value)
+                (search f neg-point midpoint))
+               ((negative? test-value)
+                (search f midpoint pos-point))
+               (else midpoint))))))
+#+END_SRC
+
+We assume that we are initially given the function [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] together with points at which its values are negative and positive. We first compute the midpoint of the two given points. Next we check to see if the given interval is small enough, and if so we simply return the midpoint as our answer. Otherwise, we compute as a test value the value of [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] at the midpoint. If the test value is positive, then we continue the process with a new interval running from the original negative point to the midpoint. If the test value is negative, we continue with the interval from the midpoint to the positive point. Finally, there is the possibility that the test value is 0, in which case the midpoint is itself the root we are searching for.
+
+To test whether the endpoints are “close enough” we can use a procedure similar to the one used in [[file:1_002e1.xhtml#g_t1_002e1_002e7][1.1.7]] for computing square roots:^{[[#FOOT55][55]]}
+
+#+BEGIN_SRC lisp
+    (define (close-enough? x y) 
+      (< (abs (- x y)) 0.001))
+#+END_SRC
+
+=Search= is awkward to use directly, because we can accidentally give it points at which [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]]'s values do not have the required sign, in which case we get a wrong answer. Instead we will use =search= via the following procedure, which checks to see which of the endpoints has a negative function value and which has a positive value, and calls the =search= procedure accordingly. If the function has the same sign on the two given points, the half-interval method cannot be used, in which case the procedure signals an error.^{[[#FOOT56][56]]}
+
+#+BEGIN_SRC lisp
+    (define (half-interval-method f a b)
+      (let ((a-value (f a))
+            (b-value (f b)))
+        (cond ((and (negative? a-value) 
+                    (positive? b-value))
+               (search f a b))
+              ((and (negative? b-value) 
+                    (positive? a-value))
+               (search f b a))
+              (else
+               (error "Values are not of 
+                       opposite sign" a b)))))
+#+END_SRC
+
+The following example uses the half-interval method to approximate [[file:fig/math/c25469cd205e957b38b51203870f48af.svg]] as the root between 2 and 4 of [[file:fig/math/ad0e0850039670aca59110f6561f4e0b.svg]]:
+
+#+BEGIN_SRC lisp
+    (half-interval-method sin 2.0 4.0)
+    3.14111328125
+#+END_SRC
+
+Here is another example, using the half-interval method to search for a root of the equation [[file:fig/math/f90ea7a26cce410633c1e74e88344c3d.svg]] between 1 and 2:
+
+#+BEGIN_SRC lisp
+    (half-interval-method 
+     (lambda (x) (- (* x x x) (* 2 x) 3))
+     1.0
+     2.0)
+    1.89306640625
+#+END_SRC
+
+<<Finding-fixed-points-of-functions>>
+***** Finding fixed points of functions
+      :PROPERTIES:
+      :CUSTOM_ID: finding-fixed-points-of-functions
+      :CLASS: subsubheading
+      :END:
+
+A number [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]] is called a <<index-fixed-point>> /fixed point/ of a function [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] if [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]] satisfies the equation [[file:fig/math/6973ec387c2ca776b59c0e24f3854033.svg]]. For some functions [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] we can locate a fixed point by beginning with an initial guess and applying [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] repeatedly, [[file:fig/math/e4fa5e281403a0f9850cfc9651238cbe.svg]] until the value does not change very much. Using this idea, we can devise a procedure =fixed-point= that takes as inputs a function and an initial guess and produces an approximation to a fixed point of the function. We apply the function repeatedly until we find two successive values whose difference is less than some prescribed tolerance:
+
+#+BEGIN_SRC lisp
+    (define tolerance 0.00001)
+
+    (define (fixed-point f first-guess)
+      (define (close-enough? v1 v2)
+        (< (abs (- v1 v2)) 
+           tolerance))
+      (define (try guess)
+        (let ((next (f guess)))
+          (if (close-enough? guess next)
+              next
+              (try next))))
+      (try first-guess))
+#+END_SRC
+
+For example, we can use this method to approximate the fixed point of the cosine function, starting with 1 as an initial approximation:^{[[#FOOT57][57]]}
+
+#+BEGIN_SRC lisp
+    (fixed-point cos 1.0)
+    .7390822985224023
+#+END_SRC
+
+Similarly, we can find a solution to the equation [[file:fig/math/0aa55add0239835caa875b8d063befab.svg]]:
+
+#+BEGIN_SRC lisp
+    (fixed-point (lambda (y) (+ (sin y) (cos y)))
+                 1.0)
+    1.2587315962971173
+#+END_SRC
+
+The fixed-point process is reminiscent of the process we used for finding square roots in [[file:1_002e1.xhtml#g_t1_002e1_002e7][1.1.7]]. Both are based on the idea of repeatedly improving a guess until the result satisfies some criterion. In fact, we can readily formulate the square-root computation as a fixed-point search. Computing the square root of some number [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]] requires finding a [[file:fig/math/05e4cdb2f26a4f66b68c167423907fea.svg]] such that [[file:fig/math/437588ce11e8725cc98d93e391d57fb8.svg]]. Putting this equation into the equivalent form [[file:fig/math/aef045715ec76889ad7e84fd30b5a3da.svg]], we recognize that we are looking for a fixed point of the function^{[[#FOOT58][58]]} [[file:fig/math/c4888039e8855b22c0b35c8152532a53.svg]], and we can therefore try to compute square roots as
+
+#+BEGIN_SRC lisp
+    (define (sqrt x)
+      (fixed-point (lambda (y) (/ x y))
+                   1.0))
+#+END_SRC
+
+Unfortunately, this fixed-point search does not converge. Consider an initial guess [[file:fig/math/c5f215b61ceace6c2622b08df19fb269.svg]]. The next guess is [[file:fig/math/3a5198b6c94fee8a5e5da16dea15f2c1.svg]] and the next guess is [[file:fig/math/ef078e24ed6d43614dbc6ec03136667b.svg]]. This results in an infinite loop in which the two guesses [[file:fig/math/c5f215b61ceace6c2622b08df19fb269.svg]] and [[file:fig/math/a920968ff08c279a310e14973392bff2.svg]] repeat over and over, oscillating about the answer.
+
+One way to control such oscillations is to prevent the guesses from changing so much. Since the answer is always between our guess [[file:fig/math/05e4cdb2f26a4f66b68c167423907fea.svg]] and [[file:fig/math/c243e54e1f37c985a92584d386f5fc01.svg]], we can make a new guess that is not as far from [[file:fig/math/05e4cdb2f26a4f66b68c167423907fea.svg]] as [[file:fig/math/c243e54e1f37c985a92584d386f5fc01.svg]] by averaging [[file:fig/math/05e4cdb2f26a4f66b68c167423907fea.svg]] with [[file:fig/math/c243e54e1f37c985a92584d386f5fc01.svg]], so that the next guess after [[file:fig/math/05e4cdb2f26a4f66b68c167423907fea.svg]] is [[file:fig/math/e0b5c0d3af60453a97c1ebc178392557.svg]] instead of [[file:fig/math/c243e54e1f37c985a92584d386f5fc01.svg]]. The process of making such a sequence of guesses is simply the process of looking for a fixed point of [[file:fig/math/d90156d1aee4bac4abaecee76393e388.svg]]:
+
+#+BEGIN_SRC lisp
+    (define (sqrt x)
+      (fixed-point 
+       (lambda (y) (average y (/ x y)))
+       1.0))
+#+END_SRC
+
+(Note that [[file:fig/math/27ff6df3c794eeaefd63a451e9c8b048.svg]] is a simple transformation of the equation [[file:fig/math/de826a8541eddb4099cf005d61b5a8b5.svg]] to derive it, add [[file:fig/math/05e4cdb2f26a4f66b68c167423907fea.svg]] to both sides of the equation and divide by 2.)
+
+With this modification, the square-root procedure works. In fact, if we unravel the definitions, we can see that the sequence of approximations to the square root generated here is precisely the same as the one generated by our original square-root procedure of [[file:1_002e1.xhtml#g_t1_002e1_002e7][1.1.7]]. This approach of averaging successive approximations to a solution, a technique that we call <<index-average-damping>> /average damping/, often aids the convergence of fixed-point searches.
+
+#+BEGIN_QUOTE
+  *<<Exercise-1_002e35>>Exercise 1.35:* Show that the golden ratio [[file:fig/math/dcc52b7b3e1a0a821032c2d16b198829.svg]] ([[file:1_002e2.xhtml#g_t1_002e2_002e2][1.2.2]]) is a fixed point of the transformation [[file:fig/math/0c2646560025915db6aa50ad3b0ada81.svg]], and use this fact to compute [[file:fig/math/dcc52b7b3e1a0a821032c2d16b198829.svg]] by means of the =fixed-point= procedure.
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+  *<<Exercise-1_002e36>>Exercise 1.36:* Modify =fixed-point= so that it prints the sequence of approximations it generates, using the =newline= and =display= primitives shown in [[file:1_002e2.xhtml#Exercise-1_002e22][Exercise 1.22]]. Then find a solution to [[file:fig/math/2e6611949fea7c5c1f17561763cc8ab1.svg]] by finding a fixed point of [[file:fig/math/62d8a7bc76798a647a3a8185e88c2d59.svg]]. (Use Scheme's primitive =log= procedure, which computes natural logarithms.) Compare the number of steps this takes with and without average damping. (Note that you cannot start =fixed-point= with a guess of 1, as this would cause division by [[file:fig/math/6f031aa94619263eace21d29b6630539.svg]].)
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+  *<<Exercise-1_002e37>>Exercise 1.37:*
+
+  1. An infinite <<index-continued-fraction>> /continued fraction/ is an expression of the form [[file:fig/math/63b5eb39f15b6aca9997b1e5ced51472.svg]] As an example, one can show that the infinite continued fraction expansion with the [[file:fig/math/303acbd84dbe1f7f07841932b03ce776.svg]] and the [[file:fig/math/83e1229ed935793e9e1d4255ab83cc6c.svg]] all equal to 1 produces [[file:fig/math/38a2250f7050470c4577ebeb6665faae.svg]], where [[file:fig/math/dcc52b7b3e1a0a821032c2d16b198829.svg]] is the golden ratio (described in [[file:1_002e2.xhtml#g_t1_002e2_002e2][1.2.2]]). One way to approximate an infinite continued fraction is to truncate the expansion after a given number of terms. Such a truncation---a so-called <<index-k_002dterm>> finite continued fraction //k/-term finite continued fraction/---has the form [[file:fig/math/1898ca495be2ad558018dc3b0c632948.svg]] Suppose that =n= and =d= are procedures of one argument (the term index [[file:fig/math/aa5dfb3bb62785181553d83502ccb9ec.svg]]) that return the [[file:fig/math/303acbd84dbe1f7f07841932b03ce776.svg]] and [[file:fig/math/83e1229ed935793e9e1d4255ab83cc6c.svg]] of the terms of the continued fraction. Define a procedure =cont-frac= such that evaluating =(cont-frac n d k)= computes the value of the [[file:fig/math/83054be07bea98353c7cda3290903d5e.svg]]-term finite continued fraction. Check your procedure by approximating [[file:fig/math/38a2250f7050470c4577ebeb6665faae.svg]] using
+
+     #+BEGIN_SRC lisp
+         (cont-frac (lambda (i) 1.0)
+                    (lambda (i) 1.0)
+                    k)
+     #+END_SRC
+
+     for successive values of =k=. How large must you make =k= in order to get an approximation that is accurate to 4 decimal places?
+
+  2. If your =cont-frac= procedure generates a recursive process, write one that generates an iterative process. If it generates an iterative process, write one that generates a recursive process.
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+  *<<Exercise-1_002e38>>Exercise 1.38:* In 1737, the Swiss mathematician Leonhard Euler published a memoir De Fractionibus Continuis, which included a continued fraction expansion for [[file:fig/math/f5a7333426389ca45f94c1de568c155f.svg]], where [[file:fig/math/debcc3e84db401938012afdc2ced88f1.svg]] is the base of the natural logarithms. In this fraction, the [[file:fig/math/303acbd84dbe1f7f07841932b03ce776.svg]] are all 1, and the [[file:fig/math/83e1229ed935793e9e1d4255ab83cc6c.svg]] are successively 1, 2, 1, 1, 4, 1, 1, 6, 1, 1, 8, .... Write a program that uses your =cont-frac= procedure from [[#Exercise-1_002e37][Exercise 1.37]] to approximate [[file:fig/math/debcc3e84db401938012afdc2ced88f1.svg]], based on Euler's expansion.
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+  *<<Exercise-1_002e39>>Exercise 1.39:* A continued fraction representation of the tangent function was published in 1770 by the German mathematician J.H. Lambert: [[file:fig/math/6f23127a12721d874d61c5de026cddc1.svg]] where [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]] is in radians. Define a procedure =(tan-cf x k)= that computes an approximation to the tangent function based on Lambert's formula. =k= specifies the number of terms to compute, as in [[#Exercise-1_002e37][Exercise 1.37]].
+#+END_QUOTE
+
+<<g_t1_002e3_002e4>> <<Procedures-as-Returned-Values>>
+**** 1.3.4Procedures as Returned Values
+     :PROPERTIES:
+     :CUSTOM_ID: procedures-as-returned-values
+     :CLASS: subsection
+     :END:
+
+The above examples demonstrate how the ability to pass procedures as arguments significantly enhances the expressive power of our programming language. We can achieve even more expressive power by creating procedures whose returned values are themselves procedures.
+
+We can illustrate this idea by looking again at the fixed-point example described at the end of [[#g_t1_002e3_002e3][1.3.3]]. We formulated a new version of the square-root procedure as a fixed-point search, starting with the observation that [[file:fig/math/f23ea9ccf69a299490e5f1e45389dbb0.svg]] is a fixed-point of the function [[file:fig/math/ddef7e56a0f80929eef40b1233f2c0d6.svg]]. Then we used average damping to make the approximations converge. Average damping is a useful general technique in itself. Namely, given a function [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]], we consider the function whose value at [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]] is equal to the average of [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]] and [[file:fig/math/b057a8e52b609c9d7031fbe3992972ef.svg]].
+
+We can express the idea of average damping by means of the following procedure:
+
+#+BEGIN_SRC lisp
+    (define (average-damp f)
+      (lambda (x) 
+        (average x (f x))))
+#+END_SRC
+
+=Average-damp= is a procedure that takes as its argument a procedure =f= and returns as its value a procedure (produced by the =lambda=) that, when applied to a number =x=, produces the average of =x= and =(f x)=. For example, applying =average-damp= to the =square= procedure produces a procedure whose value at some number [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]] is the average of [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]] and [[file:fig/math/4067ede5e74e99831d02a03c863d4f61.svg]]. Applying this resulting procedure to 10 returns the average of 10 and 100, or 55:^{[[#FOOT59][59]]}
+
+#+BEGIN_SRC lisp
+    ((average-damp square) 10)
+    55
+#+END_SRC
+
+Using =average-damp=, we can reformulate the square-root procedure as follows:
+
+#+BEGIN_SRC lisp
+    (define (sqrt x)
+      (fixed-point 
+       (average-damp 
+        (lambda (y) (/ x y)))
+       1.0))
+#+END_SRC
+
+Notice how this formulation makes explicit the three ideas in the method: fixed-point search, average damping, and the function [[file:fig/math/c4888039e8855b22c0b35c8152532a53.svg]]. It is instructive to compare this formulation of the square-root method with the original version given in [[file:1_002e1.xhtml#g_t1_002e1_002e7][1.1.7]]. Bear in mind that these procedures express the same process, and notice how much clearer the idea becomes when we express the process in terms of these abstractions. In general, there are many ways to formulate a process as a procedure. Experienced programmers know how to choose procedural formulations that are particularly perspicuous, and where useful elements of the process are exposed as separate entities that can be reused in other applications. As a simple example of reuse, notice that the cube root of [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]] is a fixed point of the function [[file:fig/math/18bb0b98243514be22ca3fe084b0b07a.svg]], so we can immediately generalize our square-root procedure to one that extracts cube roots:^{[[#FOOT60][60]]}
+
+#+BEGIN_SRC lisp
+    (define (cube-root x)
+      (fixed-point 
+       (average-damp 
+        (lambda (y) 
+          (/ x (square y))))
+       1.0))
+#+END_SRC
+
+<<Newton_0027s-method>>
+***** Newton's method
+      :PROPERTIES:
+      :CUSTOM_ID: newtons-method
+      :CLASS: subsubheading
+      :END:
+
+When we first introduced the square-root procedure, in [[file:1_002e1.xhtml#g_t1_002e1_002e7][1.1.7]], we mentioned that this was a special case of <<index-Newton_0027s-method>> /Newton's method/. If [[file:fig/math/b8d7965e16f1c2bfd1e3352f2f7b5441.svg]] is a differentiable function, then a solution of the equation [[file:fig/math/1bb87b4a000856347a1692e05ca9bf3f.svg]] is a fixed point of the function [[file:fig/math/e989fa4d5f44c42efde2012a986077b1.svg]] where [[file:fig/math/081fda9357220fdc133ee7405c8ad84d.svg]] and [[file:fig/math/9b5f6180b46c2f42142132b6707d8307.svg]] is the derivative of [[file:fig/math/658545a813335885e643f33ae78074bc.svg]] evaluated at [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]]. Newton's method is the use of the fixed-point method we saw above to approximate a solution of the equation by finding a fixed point of the function [[file:fig/math/24281a3bb1d277b889b72378360aef7a.svg]].^{[[#FOOT61][61]]}
+
+For many functions [[file:fig/math/658545a813335885e643f33ae78074bc.svg]] and for sufficiently good initial guesses for [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]], Newton's method converges very rapidly to a solution of [[file:fig/math/1bb87b4a000856347a1692e05ca9bf3f.svg]].^{[[#FOOT62][62]]}
+
+In order to implement Newton's method as a procedure, we must first express the idea of derivative. Note that “derivative,” like average damping, is something that transforms a function into another function. For instance, the derivative of the function [[file:fig/math/ac425fd6c307d8ccc07cc03c895b9e7d.svg]] is the function [[file:fig/math/ac7ca6931c571d4a707b5ebb95bf9994.svg]]. In general, if [[file:fig/math/658545a813335885e643f33ae78074bc.svg]] is a function and [[file:fig/math/a999758b4fd8ccd10d6eda8234629d51.svg]] is a small number, then the derivative [[file:fig/math/60f9f23f14887c92a25e763ddb432825.svg]] of [[file:fig/math/658545a813335885e643f33ae78074bc.svg]] is the function whose value at any number [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]] is given (in the limit of small [[file:fig/math/a999758b4fd8ccd10d6eda8234629d51.svg]]) by [[file:fig/math/51b1ca2619c2a00fbaffbeaa70e8c8d0.svg]] Thus, we can express the idea of derivative (taking [[file:fig/math/a999758b4fd8ccd10d6eda8234629d51.svg]] to be, say, 0.00001) as the procedure
+
+#+BEGIN_SRC lisp
+    (define (deriv g)
+      (lambda (x)
+        (/ (- (g (+ x dx)) (g x))
+           dx)))
+#+END_SRC
+
+along with the definition
+
+#+BEGIN_SRC lisp
+    (define dx 0.00001)
+#+END_SRC
+
+Like =average-damp=, =deriv= is a procedure that takes a procedure as argument and returns a procedure as value. For example, to approximate the derivative of [[file:fig/math/ac425fd6c307d8ccc07cc03c895b9e7d.svg]] at 5 (whose exact value is 75) we can evaluate
+
+#+BEGIN_SRC lisp
+    (define (cube x) (* x x x))
+
+    ((deriv cube) 5)
+    75.00014999664018
+#+END_SRC
+
+With the aid of =deriv=, we can express Newton's method as a fixed-point process:
+
+#+BEGIN_SRC lisp
+    (define (newton-transform g)
+      (lambda (x)
+        (- x (/ (g x) 
+                ((deriv g) x)))))
+
+    (define (newtons-method g guess)
+      (fixed-point (newton-transform g) 
+                   guess))
+#+END_SRC
+
+The =newton-transform= procedure expresses the formula at the beginning of this section, and =newtons-method= is readily defined in terms of this. It takes as arguments a procedure that computes the function for which we want to find a zero, together with an initial guess. For instance, to find the square root of [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]], we can use Newton's method to find a zero of the function [[file:fig/math/9294c125cde969bc121635c17a573a38.svg]] starting with an initial guess of 1.^{[[#FOOT63][63]]}
+
+This provides yet another form of the square-root procedure:
+
+#+BEGIN_SRC lisp
+    (define (sqrt x)
+      (newtons-method 
+       (lambda (y) 
+         (- (square y) x)) 
+       1.0))
+#+END_SRC
+
+<<Abstractions-and-first_002dclass-procedures>>
+***** Abstractions and first-class procedures
+      :PROPERTIES:
+      :CUSTOM_ID: abstractions-and-first-class-procedures
+      :CLASS: subsubheading
+      :END:
+
+We've seen two ways to express the square-root computation as an instance of a more general method, once as a fixed-point search and once using Newton's method. Since Newton's method was itself expressed as a fixed-point process, we actually saw two ways to compute square roots as fixed points. Each method begins with a function and finds a fixed point of some transformation of the function. We can express this general idea itself as a procedure:
+
+#+BEGIN_SRC lisp
+    (define (fixed-point-of-transform 
+             g transform guess)
+      (fixed-point (transform g) guess))
+#+END_SRC
+
+This very general procedure takes as its arguments a procedure =g= that computes some function, a procedure that transforms =g=, and an initial guess. The returned result is a fixed point of the transformed function.
+
+Using this abstraction, we can recast the first square-root computation from this section (where we look for a fixed point of the average-damped version of [[file:fig/math/c4888039e8855b22c0b35c8152532a53.svg]]) as an instance of this general method:
+
+#+BEGIN_SRC lisp
+    (define (sqrt x)
+      (fixed-point-of-transform 
+       (lambda (y) (/ x y))
+       average-damp
+       1.0))
+#+END_SRC
+
+Similarly, we can express the second square-root computation from this section (an instance of Newton's method that finds a fixed point of the Newton transform of [[file:fig/math/9294c125cde969bc121635c17a573a38.svg]]) as
+
+#+BEGIN_SRC lisp
+    (define (sqrt x)
+      (fixed-point-of-transform 
+       (lambda (y) (- (square y) x))
+       newton-transform
+       1.0))
+#+END_SRC
+
+We began section [[#g_t1_002e3][1.3]] with the observation that compound procedures are a crucial abstraction mechanism, because they permit us to express general methods of computing as explicit elements in our programming language. Now we've seen how higher-order procedures permit us to manipulate these general methods to create further abstractions.
+
+As programmers, we should be alert to opportunities to identify the underlying abstractions in our programs and to build upon them and generalize them to create more powerful abstractions. This is not to say that one should always write programs in the most abstract way possible; expert programmers know how to choose the level of abstraction appropriate to their task. But it is important to be able to think in terms of these abstractions, so that we can be ready to apply them in new contexts. The significance of higher-order procedures is that they enable us to represent these abstractions explicitly as elements in our programming language, so that they can be handled just like other computational elements.
+
+In general, programming languages impose restrictions on the ways in which computational elements can be manipulated. Elements with the fewest restrictions are said to have <<index-first_002dclass>> /first-class/ status. Some of the “rights and privileges” of first-class elements are:^{[[#FOOT64][64]]}
+
+- They may be named by variables.
+- They may be passed as arguments to procedures.
+- They may be returned as the results of procedures.
+- They may be included in data structures.^{[[#FOOT65][65]]}
+
+Lisp, unlike other common programming languages, awards procedures full first-class status. This poses challenges for efficient implementation, but the resulting gain in expressive power is enormous.^{[[#FOOT66][66]]}
+
+#+BEGIN_QUOTE
+  *<<Exercise-1_002e40>>Exercise 1.40:* Define a procedure =cubic= that can be used together with the =newtons-method= procedure in expressions of the form
+
+  #+BEGIN_SRC lisp
+      (newtons-method (cubic a b c) 1)
+  #+END_SRC
+
+  to approximate zeros of the cubic [[file:fig/math/5405ff8409de874ed7bdd219895b7fb8.svg]].
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+  *<<Exercise-1_002e41>>Exercise 1.41:* Define a procedure =double= that takes a procedure of one argument as argument and returns a procedure that applies the original procedure twice. For example, if =inc= is a procedure that adds 1 to its argument, then =(double inc)= should be a procedure that adds 2. What value is returned by
+
+  #+BEGIN_SRC lisp
+      (((double (double double)) inc) 5)
+  #+END_SRC
+
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+  *<<Exercise-1_002e42>>Exercise 1.42:* Let [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] and [[file:fig/math/658545a813335885e643f33ae78074bc.svg]] be two one-argument functions. The <<index-composition>> /composition/ [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] after [[file:fig/math/658545a813335885e643f33ae78074bc.svg]] is defined to be the function [[file:fig/math/b5c483e8eb9a537a8287b34a6b721b7f.svg]]. Define a procedure =compose= that implements composition. For example, if =inc= is a procedure that adds 1 to its argument,
+
+  #+BEGIN_SRC lisp
+      ((compose square inc) 6)
+      49
+  #+END_SRC
+
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+  *<<Exercise-1_002e43>>Exercise 1.43:* If [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] is a numerical function and [[file:fig/math/0932467390da34555ec70c122d7e915e.svg]] is a positive integer, then we can form the [[file:fig/math/3b6c232f796b2d291446b22cb38c933e.svg]] repeated application of [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]], which is defined to be the function whose value at [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]] is [[file:fig/math/78f46d84e8e5fbe7fe80f557cb5187f9.svg]]. For example, if [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] is the function [[file:fig/math/57f08d79273b5db0de0b7073040df346.svg]], then the [[file:fig/math/3b6c232f796b2d291446b22cb38c933e.svg]] repeated application of [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] is the function [[file:fig/math/9a7d70be73671b51681b2db17377e06a.svg]]. If [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] is the operation of squaring a number, then the [[file:fig/math/3b6c232f796b2d291446b22cb38c933e.svg]] repeated application of [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] is the function that raises its argument to the [[file:fig/math/8eaeda4e327def8a55a0cf6d7d716fa1.svg]] power. Write a procedure that takes as inputs a procedure that computes [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] and a positive integer [[file:fig/math/0932467390da34555ec70c122d7e915e.svg]] and returns the procedure that computes the [[file:fig/math/3b6c232f796b2d291446b22cb38c933e.svg]] repeated application of [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]]. Your procedure should be able to be used as follows:
+
+  #+BEGIN_SRC lisp
+      ((repeated square 2) 5)
+      625
+  #+END_SRC
+
+  Hint: You may find it convenient to use =compose= from [[#Exercise-1_002e42][Exercise 1.42]].
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+  *<<Exercise-1_002e44>>Exercise 1.44:* The idea of <<index-smoothing>> /smoothing/ a function is an important concept in signal processing. If [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] is a function and [[file:fig/math/a999758b4fd8ccd10d6eda8234629d51.svg]] is some small number, then the smoothed version of [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] is the function whose value at a point [[file:fig/math/2f4b15565d0a1018e90c3e1b30b76acc.svg]] is the average of [[file:fig/math/d9e5595beefdff468eeafe7717bf4891.svg]], [[file:fig/math/b057a8e52b609c9d7031fbe3992972ef.svg]], and [[file:fig/math/c1a6758b4b5770cca95dc3b49310f975.svg]]. Write a procedure =smooth= that takes as input a procedure that computes [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]] and returns a procedure that computes the smoothed [[file:fig/math/7a8d165d31a04fc319968e0213091ff8.svg]]. It is sometimes valuable to repeatedly smooth a function (that is, smooth the smoothed function, and so on) to obtain the <<index-n_002dfold-smoothed-function>> //n/-fold smoothed function/. Show how to generate the /n/-fold smoothed function of any given function using =smooth= and =repeated= from [[#Exercise-1_002e43][Exercise 1.43]].
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+  *<<Exercise-1_002e45>>Exercise 1.45:* We saw in [[#g_t1_002e3_002e3][1.3.3]] that attempting to compute square roots by naively finding a fixed point of [[file:fig/math/c4888039e8855b22c0b35c8152532a53.svg]] does not converge, and that this can be fixed by average damping. The same method works for finding cube roots as fixed points of the average-damped [[file:fig/math/18bb0b98243514be22ca3fe084b0b07a.svg]]. Unfortunately, the process does not work for fourth roots---a single average damp is not enough to make a fixed-point search for [[file:fig/math/ee3c68d0350ab75033b5737a37031060.svg]] converge. On the other hand, if we average damp twice (i.e., use the average damp of the average damp of [[file:fig/math/ee3c68d0350ab75033b5737a37031060.svg]]) the fixed-point search does converge. Do some experiments to determine how many average damps are required to compute [[file:fig/math/3b6c232f796b2d291446b22cb38c933e.svg]] roots as a fixed-point search based upon repeated average damping of [[file:fig/math/688ae2de37fbe7a18cfc0edcc889f8dc.svg]]. Use this to implement a simple procedure for computing [[file:fig/math/3b6c232f796b2d291446b22cb38c933e.svg]] roots using =fixed-point=, =average-damp=, and the =repeated= procedure of [[#Exercise-1_002e43][Exercise 1.43]]. Assume that any arithmetic operations you need are available as primitives.
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+  *<<Exercise-1_002e46>>Exercise 1.46:* Several of the numerical methods described in this chapter are instances of an extremely general computational strategy known as <<index-iterative-improvement>> /iterative improvement/. Iterative improvement says that, to compute something, we start with an initial guess for the answer, test if the guess is good enough, and otherwise improve the guess and continue the process using the improved guess as the new guess. Write a procedure =iterative-improve= that takes two procedures as arguments: a method for telling whether a guess is good enough and a method for improving a guess. =Iterative-improve= should return as its value a procedure that takes a guess as argument and keeps improving the guess until it is good enough. Rewrite the =sqrt= procedure of [[file:1_002e1.xhtml#g_t1_002e1_002e7][1.1.7]] and the =fixed-point= procedure of [[#g_t1_002e3_002e3][1.3.3]] in terms of =iterative-improve=.
+#+END_QUOTE
+
+**** Footnotes
+     :PROPERTIES:
+     :CUSTOM_ID: footnotes
+     :CLASS: footnotes-heading
+     :END:
+
+[[#DOCF49][^{49}]] This series, usually written in the equivalent form [[file:fig/math/8fb226294dc22a2a6271b433e09a1435.svg]], is due to Leibniz. We'll see how to use this as the basis for some fancy numerical tricks in [[file:3_002e5.xhtml#g_t3_002e5_002e3][3.5.3]].
+
+[[#DOCF50][^{50}]] Notice that we have used block structure ([[file:1_002e1.xhtml#g_t1_002e1_002e8][1.1.8]]) to embed the definitions of =pi-next= and =pi-term= within =pi-sum=, since these procedures are unlikely to be useful for any other purpose. We will see how to get rid of them altogether in [[#g_t1_002e3_002e2][1.3.2]].
+
+[[#DOCF51][^{51}]] The intent of [[#Exercise-1_002e31][Exercise 1.31]] through [[#Exercise-1_002e33][Exercise 1.33]] is to demonstrate the expressive power that is attained by using an appropriate abstraction to consolidate many seemingly disparate operations. However, though accumulation and filtering are elegant ideas, our hands are somewhat tied in using them at this point since we do not yet have data structures to provide suitable means of combination for these abstractions. We will return to these ideas in [[file:2_002e2.xhtml#g_t2_002e2_002e3][2.2.3]] when we show how to use <<index-sequences>> /sequences/ as interfaces for combining filters and accumulators to build even more powerful abstractions. We will see there how these methods really come into their own as a powerful and elegant approach to designing programs.
+
+[[#DOCF52][^{52}]] This formula was discovered by the seventeenth-century English mathematician John Wallis.
+
+[[#DOCF53][^{53}]] It would be clearer and less intimidating to people learning Lisp if a name more obvious than =lambda=, such as =make-procedure=, were used. But the convention is firmly entrenched. The notation is adopted from the λ-calculus, a mathematical formalism introduced by the mathematical logician Alonzo [[file:References.xhtml#Church-_00281941_0029][Church (1941)]]. Church developed the λ-calculus to provide a rigorous foundation for studying the notions of function and function application. The λ-calculus has become a basic tool for mathematical investigations of the semantics of programming languages.
+
+[[#DOCF54][^{54}]] Understanding internal definitions well enough to be sure a program means what we intend it to mean requires a more elaborate model of the evaluation process than we have presented in this chapter. The subtleties do not arise with internal definitions of procedures, however. We will return to this issue in [[file:4_002e1.xhtml#g_t4_002e1_002e6][4.1.6]], after we learn more about evaluation.
+
+[[#DOCF55][^{55}]] We have used 0.001 as a representative “small” number to indicate a tolerance for the acceptable error in a calculation. The appropriate tolerance for a real calculation depends upon the problem to be solved and the limitations of the computer and the algorithm. This is often a very subtle consideration, requiring help from a numerical analyst or some other kind of magician.
+
+[[#DOCF56][^{56}]] This can be accomplished using =error=, which takes as arguments a number of items that are printed as error messages.
+
+[[#DOCF57][^{57}]] Try this during a boring lecture: Set your calculator to radians mode and then repeatedly press the =cos= button until you obtain the fixed point.
+
+[[#DOCF58][^{58}]] [[file:fig/math/0ce91553aad27651969cc77ddd0cb826.svg]] (pronounced “maps to”) is the mathematician's way of writing =lambda=. [[file:fig/math/c4888039e8855b22c0b35c8152532a53.svg]] means =(lambda (y) (/ x y))=, that is, the function whose value at [[file:fig/math/05e4cdb2f26a4f66b68c167423907fea.svg]] is [[file:fig/math/c243e54e1f37c985a92584d386f5fc01.svg]].
+
+[[#DOCF59][^{59}]] Observe that this is a combination whose operator is itself a combination. [[file:1_002e1.xhtml#Exercise-1_002e4][Exercise 1.4]] already demonstrated the ability to form such combinations, but that was only a toy example. Here we begin to see the real need for such combinations---when applying a procedure that is obtained as the value returned by a higher-order procedure.
+
+[[#DOCF60][^{60}]] See [[#Exercise-1_002e45][Exercise 1.45]] for a further generalization.
+
+[[#DOCF61][^{61}]] Elementary calculus books usually describe Newton's method in terms of the sequence of approximations [[file:fig/math/96cbc64b5b9346071e74621f47f63af6.svg]]. Having language for talking about processes and using the idea of fixed points simplifies the description of the method.
+
+[[#DOCF62][^{62}]] Newton's method does not always converge to an answer, but it can be shown that in favorable cases each iteration doubles the number-of-digits accuracy of the approximation to the solution. In such cases, Newton's method will converge much more rapidly than the half-interval method.
+
+[[#DOCF63][^{63}]] For finding square roots, Newton's method converges rapidly to the correct solution from any starting point.
+
+[[#DOCF64][^{64}]] The notion of first-class status of programming-language elements is due to the British computer scientist Christopher Strachey (1916-1975).
+
+[[#DOCF65][^{65}]] We'll see examples of this after we introduce data structures in [[file:Chapter-2.xhtml#Chapter-2][Chapter 2]].
+
+[[#DOCF66][^{66}]] The major implementation cost of first-class procedures is that allowing procedures to be returned as values requires reserving storage for a procedure's free variables even while the procedure is not executing. In the Scheme implementation we will study in [[file:4_002e1.xhtml#g_t4_002e1][4.1]], these variables are stored in the procedure's environment.
+
+Next: [[file:Chapter-2.xhtml#Chapter-2][Chapter 2]], Prev: [[file:1_002e2.xhtml#g_t1_002e2][1.2]], Up: [[#g_t1_002e3][1.3]]   [[[file:index.xhtml#SEC_Contents][Contents]]]
+
+[[#pagebottom][⇣]]<<pagebottom>>

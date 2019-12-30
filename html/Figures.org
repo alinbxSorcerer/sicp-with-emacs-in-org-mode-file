@@ -1,0 +1,67 @@
+[[#pagetop][⇡]]<<pagetop>><<Figures>>
+Next: [[file:Term-Index.xhtml#Term-Index][Term Index]], Prev: [[file:Exercises.xhtml#Exercises][Exercises]], Up: [[file:index.xhtml#Top][Top]]   [[[file:index.xhtml#SEC_Contents][Contents]]]
+
+<<List-of-Figures>>
+** List of Figures
+   :PROPERTIES:
+   :CUSTOM_ID: list-of-figures
+   :CLASS: unnumbered
+   :END:
+
+<<Chapter-1-2>>
+***** Chapter 1
+      :PROPERTIES:
+      :CUSTOM_ID: chapter-1
+      :CLASS: subsubheading
+      :END:
+
+| [[file:1_002e1.xhtml#Figure-1_002e1][1.1]]   | [[file:1_002e1.xhtml#Figure-1_002e2][1.2]]   | [[file:1_002e2.xhtml#Figure-1_002e3][1.3]]   | [[file:1_002e2.xhtml#Figure-1_002e4][1.4]]   | [[file:1_002e2.xhtml#Figure-1_002e5][1.5]]   |    |
+
+<<Chapter-2-2>>
+***** Chapter 2
+      :PROPERTIES:
+      :CUSTOM_ID: chapter-2
+      :CLASS: subsubheading
+      :END:
+
+| [[file:2_002e1.xhtml#Figure-2_002e1][2.1]]     | [[file:2_002e2.xhtml#Figure-2_002e2][2.2]]     | [[file:2_002e2.xhtml#Figure-2_002e3][2.3]]     | [[file:2_002e2.xhtml#Figure-2_002e4][2.4]]     | [[file:2_002e2.xhtml#Figure-2_002e5][2.5]]     | [[file:2_002e2.xhtml#Figure-2_002e6][2.6]]     | [[file:2_002e2.xhtml#Figure-2_002e7][2.7]]     | [[file:2_002e2.xhtml#Figure-2_002e8][2.8]]     |
+| [[file:2_002e2.xhtml#Figure-2_002e9][2.9]]     | [[file:2_002e2.xhtml#Figure-2_002e10][2.10]]   | [[file:2_002e2.xhtml#Figure-2_002e11][2.11]]   | [[file:2_002e2.xhtml#Figure-2_002e12][2.12]]   | [[file:2_002e2.xhtml#Figure-2_002e13][2.13]]   | [[file:2_002e2.xhtml#Figure-2_002e14][2.14]]   | [[file:2_002e2.xhtml#Figure-2_002e15][2.15]]   | [[file:2_002e3.xhtml#Figure-2_002e16][2.16]]   |
+| [[file:2_002e3.xhtml#Figure-2_002e17][2.17]]   | [[file:2_002e3.xhtml#Figure-2_002e18][2.18]]   | [[file:2_002e4.xhtml#Figure-2_002e19][2.19]]   | [[file:2_002e4.xhtml#Figure-2_002e20][2.20]]   | [[file:2_002e4.xhtml#Figure-2_002e21][2.21]]   | [[file:2_002e4.xhtml#Figure-2_002e22][2.22]]   | [[file:2_002e5.xhtml#Figure-2_002e23][2.23]]   | [[file:2_002e5.xhtml#Figure-2_002e24][2.24]]   |
+| [[file:2_002e5.xhtml#Figure-2_002e25][2.25]]   | [[file:2_002e5.xhtml#Figure-2_002e26][2.26]]   |                                                |                                                |                                                |                                                |                                                |                                                |
+
+<<Chapter-3-2>>
+***** Chapter 3
+      :PROPERTIES:
+      :CUSTOM_ID: chapter-3
+      :CLASS: subsubheading
+      :END:
+
+| [[file:3_002e2.xhtml#Figure-3_002e1][3.1]]     | [[file:3_002e2.xhtml#Figure-3_002e2][3.2]]     | [[file:3_002e2.xhtml#Figure-3_002e3][3.3]]     | [[file:3_002e2.xhtml#Figure-3_002e4][3.4]]     | [[file:3_002e2.xhtml#Figure-3_002e5][3.5]]     | [[file:3_002e2.xhtml#Figure-3_002e6][3.6]]     | [[file:3_002e2.xhtml#Figure-3_002e7][3.7]]     | [[file:3_002e2.xhtml#Figure-3_002e8][3.8]]     |
+| [[file:3_002e2.xhtml#Figure-3_002e9][3.9]]     | [[file:3_002e2.xhtml#Figure-3_002e10][3.10]]   | [[file:3_002e2.xhtml#Figure-3_002e11][3.11]]   | [[file:3_002e3.xhtml#Figure-3_002e12][3.12]]   | [[file:3_002e3.xhtml#Figure-3_002e13][3.13]]   | [[file:3_002e3.xhtml#Figure-3_002e14][3.14]]   | [[file:3_002e3.xhtml#Figure-3_002e15][3.15]]   | [[file:3_002e3.xhtml#Figure-3_002e16][3.16]]   |
+| [[file:3_002e3.xhtml#Figure-3_002e17][3.17]]   | [[file:3_002e3.xhtml#Figure-3_002e18][3.18]]   | [[file:3_002e3.xhtml#Figure-3_002e19][3.19]]   | [[file:3_002e3.xhtml#Figure-3_002e20][3.20]]   | [[file:3_002e3.xhtml#Figure-3_002e21][3.21]]   | [[file:3_002e3.xhtml#Figure-3_002e22][3.22]]   | [[file:3_002e3.xhtml#Figure-3_002e23][3.23]]   | [[file:3_002e3.xhtml#Figure-3_002e24][3.24]]   |
+| [[file:3_002e3.xhtml#Figure-3_002e25][3.25]]   | [[file:3_002e3.xhtml#Figure-3_002e26][3.26]]   | [[file:3_002e3.xhtml#Figure-3_002e27][3.27]]   | [[file:3_002e3.xhtml#Figure-3_002e28][3.28]]   | [[file:3_002e4.xhtml#Figure-3_002e29][3.29]]   | [[file:3_002e4.xhtml#Figure-3_002e30][3.30]]   | [[file:3_002e5.xhtml#Figure-3_002e31][3.31]]   | [[file:3_002e5.xhtml#Figure-3_002e32][3.32]]   |
+| [[file:3_002e5.xhtml#Figure-3_002e33][3.33]]   | [[file:3_002e5.xhtml#Figure-3_002e34][3.34]]   | [[file:3_002e5.xhtml#Figure-3_002e35][3.35]]   | [[file:3_002e5.xhtml#Figure-3_002e36][3.36]]   | [[file:3_002e5.xhtml#Figure-3_002e37][3.37]]   | [[file:3_002e5.xhtml#Figure-3_002e38][3.38]]   |                                                |                                                |
+
+<<Chapter-4-2>>
+***** Chapter 4
+      :PROPERTIES:
+      :CUSTOM_ID: chapter-4
+      :CLASS: subsubheading
+      :END:
+
+| [[file:4_002e1.xhtml#Figure-4_002e1][4.1]]   | [[file:4_002e1.xhtml#Figure-4_002e2][4.2]]   | [[file:4_002e1.xhtml#Figure-4_002e3][4.3]]   | [[file:4_002e4.xhtml#Figure-4_002e4][4.4]]   | [[file:4_002e4.xhtml#Figure-4_002e5][4.5]]   | [[file:4_002e4.xhtml#Figure-4_002e6][4.6]]   |    |
+
+<<Chapter-5-2>>
+***** Chapter 5
+      :PROPERTIES:
+      :CUSTOM_ID: chapter-5
+      :CLASS: subsubheading
+      :END:
+
+| [[file:5_002e1.xhtml#Figure-5_002e1][5.1]]     | [[file:5_002e1.xhtml#Figure-5_002e2][5.2]]     | [[file:5_002e1.xhtml#Figure-5_002e3][5.3]]     | [[file:5_002e1.xhtml#Figure-5_002e4][5.4]]     | [[file:5_002e1.xhtml#Figure-5_002e5][5.5]]     | [[file:5_002e1.xhtml#Figure-5_002e6][5.6]]     | [[file:5_002e1.xhtml#Figure-5_002e7][5.7]]     | [[file:5_002e1.xhtml#Figure-5_002e8][5.8]]     |
+| [[file:5_002e1.xhtml#Figure-5_002e9][5.9]]     | [[file:5_002e1.xhtml#Figure-5_002e10][5.10]]   | [[file:5_002e1.xhtml#Figure-5_002e11][5.11]]   | [[file:5_002e1.xhtml#Figure-5_002e12][5.12]]   | [[file:5_002e2.xhtml#Figure-5_002e13][5.13]]   | [[file:5_002e3.xhtml#Figure-5_002e14][5.14]]   | [[file:5_002e3.xhtml#Figure-5_002e15][5.15]]   | [[file:5_002e4.xhtml#Figure-5_002e16][5.16]]   |
+| [[file:5_002e5.xhtml#Figure-5_002e17][5.17]]   | [[file:5_002e5.xhtml#Figure-5_002e18][5.18]]   |                                                |                                                |                                                |                                                |                                                |                                                |
+
+Next: [[file:Term-Index.xhtml#Term-Index][Term Index]], Prev: [[file:Exercises.xhtml#Exercises][Exercises]], Up: [[file:index.xhtml#Top][Top]]   [[[file:index.xhtml#SEC_Contents][Contents]]]
+
+[[#pagebottom][⇣]]<<pagebottom>>

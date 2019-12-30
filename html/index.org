@@ -1,0 +1,263 @@
+[[#pagetop][⇡]]<<pagetop>>
+* Structure and Interpretation\\
+of Computer Programs
+  :PROPERTIES:
+  :CUSTOM_ID: structure-and-interpretation-of-computer-programs
+  :CLASS: titlefont
+  :END:
+
+Second Edition\\
+Unofficial Texinfo Format 2.andresraba6.6
+
+*Harold Abelson and Gerald Jay Sussman with Julie Sussman, foreword by Alan J. Perlis*\\
+©1996 by The Massachusetts Institute of Technology
+
+[[file:fig/icons/cc.std.svg]] [[file:fig/icons/by.std.svg]] [[file:fig/icons/sa.std.svg]]
+This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License ([[http://creativecommons.org/licenses/by-sa/4.0/][CC BY-SA 4.0]]). Based on a work at [[http://mitpress.mit.edu/sicp/][mitpress.mit.edu]].
+
+The MIT Press\\
+Cambridge, Massachusetts\\
+London, England
+
+McGraw-Hill Book Company\\
+New York, St. Louis, San Francisco,\\
+Montreal, Toronto
+
+This book is one of a series of texts written by faculty of the Electrical Engineering and Computer Science Department at the Massachusetts Institute of Technology. It was edited and produced by The MIT Press under a joint production-distribution arrangement with the McGraw-Hill Book Company.
+
+Unofficial Texinfo Format [[http://sicpebook.wordpress.com][2.andresraba6.6]] (September 16, 2015), based on [[http://www.neilvandyke.org/sicp-texi/][2.neilvandyke4]] (January 10, 2007).
+
+<<SEC_Overview>>
+** Short Table of Contents
+   :PROPERTIES:
+   :CUSTOM_ID: short-table-of-contents
+   :CLASS: shortcontents-heading
+   :END:
+
+- [[#toc-Unofficial-Texinfo-Format][Unofficial Texinfo Format]]
+- [[#toc-Dedication-1][Dedication]]
+- [[#toc-Foreword-1][Foreword]]
+- [[#toc-Preface-to-the-Second-Edition][Preface to the Second Edition]]
+- [[#toc-Preface-to-the-First-Edition][Preface to the First Edition]]
+- [[#toc-Acknowledgments-1][Acknowledgments]]
+- [[#toc-Building-Abstractions-with-Procedures][1 Building Abstractions with Procedures]]
+- [[#toc-Building-Abstractions-with-Data][2 Building Abstractions with Data]]
+- [[#toc-Modularity_002c-Objects_002c-and-State][3 Modularity, Objects, and State]]
+- [[#toc-Metalinguistic-Abstraction][4 Metalinguistic Abstraction]]
+- [[#toc-Computing-with-Register-Machines][5 Computing with Register Machines]]
+- [[#toc-References-1][References]]
+- [[#toc-List-of-Exercises][List of Exercises]]
+- [[#toc-List-of-Figures][List of Figures]]
+- [[#toc-Term-Index-1][Term Index]]
+- [[#toc-Colophon-1][Colophon]]
+
+<<SEC_Contents>>
+** Table of Contents
+   :PROPERTIES:
+   :CUSTOM_ID: table-of-contents
+   :CLASS: contents-heading
+   :END:
+
+- [[file:UTF.xhtml#UTF][Unofficial Texinfo Format]]
+- [[file:Dedication.xhtml#Dedication][Dedication]]
+- [[file:Foreword.xhtml#Foreword][Foreword]]
+- [[file:Preface.xhtml#Preface][Preface to the Second Edition]]
+- [[file:Preface-1e.xhtml#Preface-1e][Preface to the First Edition]]
+- [[file:Acknowledgments.xhtml#Acknowledgments][Acknowledgments]]
+- [[file:Chapter-1.xhtml#Chapter-1][1 Building Abstractions with Procedures]]
+
+  - [[file:1_002e1.xhtml#g_t1_002e1][1.1 The Elements of Programming]]
+
+    - [[file:1_002e1.xhtml#g_t1_002e1_002e1][1.1.1 Expressions]]
+    - [[file:1_002e1.xhtml#g_t1_002e1_002e2][1.1.2 Naming and the Environment]]
+    - [[file:1_002e1.xhtml#g_t1_002e1_002e3][1.1.3 Evaluating Combinations]]
+    - [[file:1_002e1.xhtml#g_t1_002e1_002e4][1.1.4 Compound Procedures]]
+    - [[file:1_002e1.xhtml#g_t1_002e1_002e5][1.1.5 The Substitution Model for Procedure Application]]
+    - [[file:1_002e1.xhtml#g_t1_002e1_002e6][1.1.6 Conditional Expressions and Predicates]]
+    - [[file:1_002e1.xhtml#g_t1_002e1_002e7][1.1.7 Example: Square Roots by Newton's Method]]
+    - [[file:1_002e1.xhtml#g_t1_002e1_002e8][1.1.8 Procedures as Black-Box Abstractions]]
+
+  - [[file:1_002e2.xhtml#g_t1_002e2][1.2 Procedures and the Processes They Generate]]
+
+    - [[file:1_002e2.xhtml#g_t1_002e2_002e1][1.2.1 Linear Recursion and Iteration]]
+    - [[file:1_002e2.xhtml#g_t1_002e2_002e2][1.2.2 Tree Recursion]]
+    - [[file:1_002e2.xhtml#g_t1_002e2_002e3][1.2.3 Orders of Growth]]
+    - [[file:1_002e2.xhtml#g_t1_002e2_002e4][1.2.4 Exponentiation]]
+    - [[file:1_002e2.xhtml#g_t1_002e2_002e5][1.2.5 Greatest Common Divisors]]
+    - [[file:1_002e2.xhtml#g_t1_002e2_002e6][1.2.6 Example: Testing for Primality]]
+
+  - [[file:1_002e3.xhtml#g_t1_002e3][1.3 Formulating Abstractions with Higher-Order Procedures]]
+
+    - [[file:1_002e3.xhtml#g_t1_002e3_002e1][1.3.1 Procedures as Arguments]]
+    - [[file:1_002e3.xhtml#g_t1_002e3_002e2][1.3.2 Constructing Procedures Using =Lambda=]]
+    - [[file:1_002e3.xhtml#g_t1_002e3_002e3][1.3.3 Procedures as General Methods]]
+    - [[file:1_002e3.xhtml#g_t1_002e3_002e4][1.3.4 Procedures as Returned Values]]
+
+- [[file:Chapter-2.xhtml#Chapter-2][2 Building Abstractions with Data]]
+
+  - [[file:2_002e1.xhtml#g_t2_002e1][2.1 Introduction to Data Abstraction]]
+
+    - [[file:2_002e1.xhtml#g_t2_002e1_002e1][2.1.1 Example: Arithmetic Operations for Rational Numbers]]
+    - [[file:2_002e1.xhtml#g_t2_002e1_002e2][2.1.2 Abstraction Barriers]]
+    - [[file:2_002e1.xhtml#g_t2_002e1_002e3][2.1.3 What Is Meant by Data?]]
+    - [[file:2_002e1.xhtml#g_t2_002e1_002e4][2.1.4 Extended Exercise: Interval Arithmetic]]
+
+  - [[file:2_002e2.xhtml#g_t2_002e2][2.2 Hierarchical Data and the Closure Property]]
+
+    - [[file:2_002e2.xhtml#g_t2_002e2_002e1][2.2.1 Representing Sequences]]
+    - [[file:2_002e2.xhtml#g_t2_002e2_002e2][2.2.2 Hierarchical Structures]]
+    - [[file:2_002e2.xhtml#g_t2_002e2_002e3][2.2.3 Sequences as Conventional Interfaces]]
+    - [[file:2_002e2.xhtml#g_t2_002e2_002e4][2.2.4 Example: A Picture Language]]
+
+  - [[file:2_002e3.xhtml#g_t2_002e3][2.3 Symbolic Data]]
+
+    - [[file:2_002e3.xhtml#g_t2_002e3_002e1][2.3.1 Quotation]]
+    - [[file:2_002e3.xhtml#g_t2_002e3_002e2][2.3.2 Example: Symbolic Differentiation]]
+    - [[file:2_002e3.xhtml#g_t2_002e3_002e3][2.3.3 Example: Representing Sets]]
+    - [[file:2_002e3.xhtml#g_t2_002e3_002e4][2.3.4 Example: Huffman Encoding Trees]]
+
+  - [[file:2_002e4.xhtml#g_t2_002e4][2.4 Multiple Representations for Abstract Data]]
+
+    - [[file:2_002e4.xhtml#g_t2_002e4_002e1][2.4.1 Representations for Complex Numbers]]
+    - [[file:2_002e4.xhtml#g_t2_002e4_002e2][2.4.2 Tagged data]]
+    - [[file:2_002e4.xhtml#g_t2_002e4_002e3][2.4.3 Data-Directed Programming and Additivity]]
+
+  - [[file:2_002e5.xhtml#g_t2_002e5][2.5 Systems with Generic Operations]]
+
+    - [[file:2_002e5.xhtml#g_t2_002e5_002e1][2.5.1 Generic Arithmetic Operations]]
+    - [[file:2_002e5.xhtml#g_t2_002e5_002e2][2.5.2 Combining Data of Different Types]]
+    - [[file:2_002e5.xhtml#g_t2_002e5_002e3][2.5.3 Example: Symbolic Algebra]]
+
+- [[file:Chapter-3.xhtml#Chapter-3][3 Modularity, Objects, and State]]
+
+  - [[file:3_002e1.xhtml#g_t3_002e1][3.1 Assignment and Local State]]
+
+    - [[file:3_002e1.xhtml#g_t3_002e1_002e1][3.1.1 Local State Variables]]
+    - [[file:3_002e1.xhtml#g_t3_002e1_002e2][3.1.2 The Benefits of Introducing Assignment]]
+    - [[file:3_002e1.xhtml#g_t3_002e1_002e3][3.1.3 The Costs of Introducing Assignment]]
+
+  - [[file:3_002e2.xhtml#g_t3_002e2][3.2 The Environment Model of Evaluation]]
+
+    - [[file:3_002e2.xhtml#g_t3_002e2_002e1][3.2.1 The Rules for Evaluation]]
+    - [[file:3_002e2.xhtml#g_t3_002e2_002e2][3.2.2 Applying Simple Procedures]]
+    - [[file:3_002e2.xhtml#g_t3_002e2_002e3][3.2.3 Frames as the Repository of Local State]]
+    - [[file:3_002e2.xhtml#g_t3_002e2_002e4][3.2.4 Internal Definitions]]
+
+  - [[file:3_002e3.xhtml#g_t3_002e3][3.3 Modeling with Mutable Data]]
+
+    - [[file:3_002e3.xhtml#g_t3_002e3_002e1][3.3.1 Mutable List Structure]]
+    - [[file:3_002e3.xhtml#g_t3_002e3_002e2][3.3.2 Representing Queues]]
+    - [[file:3_002e3.xhtml#g_t3_002e3_002e3][3.3.3 Representing Tables]]
+    - [[file:3_002e3.xhtml#g_t3_002e3_002e4][3.3.4 A Simulator for Digital Circuits]]
+    - [[file:3_002e3.xhtml#g_t3_002e3_002e5][3.3.5 Propagation of Constraints]]
+
+  - [[file:3_002e4.xhtml#g_t3_002e4][3.4 Concurrency: Time Is of the Essence]]
+
+    - [[file:3_002e4.xhtml#g_t3_002e4_002e1][3.4.1 The Nature of Time in Concurrent Systems]]
+    - [[file:3_002e4.xhtml#g_t3_002e4_002e2][3.4.2 Mechanisms for Controlling Concurrency]]
+
+  - [[file:3_002e5.xhtml#g_t3_002e5][3.5 Streams]]
+
+    - [[file:3_002e5.xhtml#g_t3_002e5_002e1][3.5.1 Streams Are Delayed Lists]]
+    - [[file:3_002e5.xhtml#g_t3_002e5_002e2][3.5.2 Infinite Streams]]
+    - [[file:3_002e5.xhtml#g_t3_002e5_002e3][3.5.3 Exploiting the Stream Paradigm]]
+    - [[file:3_002e5.xhtml#g_t3_002e5_002e4][3.5.4 Streams and Delayed Evaluation]]
+    - [[file:3_002e5.xhtml#g_t3_002e5_002e5][3.5.5 Modularity of Functional Programs and Modularity of Objects]]
+
+- [[file:Chapter-4.xhtml#Chapter-4][4 Metalinguistic Abstraction]]
+
+  - [[file:4_002e1.xhtml#g_t4_002e1][4.1 The Metacircular Evaluator]]
+
+    - [[file:4_002e1.xhtml#g_t4_002e1_002e1][4.1.1 The Core of the Evaluator]]
+    - [[file:4_002e1.xhtml#g_t4_002e1_002e2][4.1.2 Representing Expressions]]
+    - [[file:4_002e1.xhtml#g_t4_002e1_002e3][4.1.3 Evaluator Data Structures]]
+    - [[file:4_002e1.xhtml#g_t4_002e1_002e4][4.1.4 Running the Evaluator as a Program]]
+    - [[file:4_002e1.xhtml#g_t4_002e1_002e5][4.1.5 Data as Programs]]
+    - [[file:4_002e1.xhtml#g_t4_002e1_002e6][4.1.6 Internal Definitions]]
+    - [[file:4_002e1.xhtml#g_t4_002e1_002e7][4.1.7 Separating Syntactic Analysis from Execution]]
+
+  - [[file:4_002e2.xhtml#g_t4_002e2][4.2 Variations on a Scheme --- Lazy Evaluation]]
+
+    - [[file:4_002e2.xhtml#g_t4_002e2_002e1][4.2.1 Normal Order and Applicative Order]]
+    - [[file:4_002e2.xhtml#g_t4_002e2_002e2][4.2.2 An Interpreter with Lazy Evaluation]]
+    - [[file:4_002e2.xhtml#g_t4_002e2_002e3][4.2.3 Streams as Lazy Lists]]
+
+  - [[file:4_002e3.xhtml#g_t4_002e3][4.3 Variations on a Scheme --- Nondeterministic Computing]]
+
+    - [[file:4_002e3.xhtml#g_t4_002e3_002e1][4.3.1 Amb and Search]]
+    - [[file:4_002e3.xhtml#g_t4_002e3_002e2][4.3.2 Examples of Nondeterministic Programs]]
+    - [[file:4_002e3.xhtml#g_t4_002e3_002e3][4.3.3 Implementing the =Amb= Evaluator]]
+
+  - [[file:4_002e4.xhtml#g_t4_002e4][4.4 Logic Programming]]
+
+    - [[file:4_002e4.xhtml#g_t4_002e4_002e1][4.4.1 Deductive Information Retrieval]]
+    - [[file:4_002e4.xhtml#g_t4_002e4_002e2][4.4.2 How the Query System Works]]
+    - [[file:4_002e4.xhtml#g_t4_002e4_002e3][4.4.3 Is Logic Programming Mathematical Logic?]]
+    - [[file:4_002e4.xhtml#g_t4_002e4_002e4][4.4.4 Implementing the Query System]]
+
+      - [[file:4_002e4.xhtml#g_t4_002e4_002e4_002e1][4.4.4.1 The Driver Loop and Instantiation]]
+      - [[file:4_002e4.xhtml#g_t4_002e4_002e4_002e2][4.4.4.2 The Evaluator]]
+      - [[file:4_002e4.xhtml#g_t4_002e4_002e4_002e3][4.4.4.3 Finding Assertions by Pattern Matching]]
+      - [[file:4_002e4.xhtml#g_t4_002e4_002e4_002e4][4.4.4.4 Rules and Unification]]
+      - [[file:4_002e4.xhtml#g_t4_002e4_002e4_002e5][4.4.4.5 Maintaining the Data Base]]
+      - [[file:4_002e4.xhtml#g_t4_002e4_002e4_002e6][4.4.4.6 Stream Operations]]
+      - [[file:4_002e4.xhtml#g_t4_002e4_002e4_002e7][4.4.4.7 Query Syntax Procedures]]
+      - [[file:4_002e4.xhtml#g_t4_002e4_002e4_002e8][4.4.4.8 Frames and Bindings]]
+
+- [[file:Chapter-5.xhtml#Chapter-5][5 Computing with Register Machines]]
+
+  - [[file:5_002e1.xhtml#g_t5_002e1][5.1 Designing Register Machines]]
+
+    - [[file:5_002e1.xhtml#g_t5_002e1_002e1][5.1.1 A Language for Describing Register Machines]]
+    - [[file:5_002e1.xhtml#g_t5_002e1_002e2][5.1.2 Abstraction in Machine Design]]
+    - [[file:5_002e1.xhtml#g_t5_002e1_002e3][5.1.3 Subroutines]]
+    - [[file:5_002e1.xhtml#g_t5_002e1_002e4][5.1.4 Using a Stack to Implement Recursion]]
+    - [[file:5_002e1.xhtml#g_t5_002e1_002e5][5.1.5 Instruction Summary]]
+
+  - [[file:5_002e2.xhtml#g_t5_002e2][5.2 A Register-Machine Simulator]]
+
+    - [[file:5_002e2.xhtml#g_t5_002e2_002e1][5.2.1 The Machine Model]]
+    - [[file:5_002e2.xhtml#g_t5_002e2_002e2][5.2.2 The Assembler]]
+    - [[file:5_002e2.xhtml#g_t5_002e2_002e3][5.2.3 Generating Execution Procedures for Instructions]]
+    - [[file:5_002e2.xhtml#g_t5_002e2_002e4][5.2.4 Monitoring Machine Performance]]
+
+  - [[file:5_002e3.xhtml#g_t5_002e3][5.3 Storage Allocation and Garbage Collection]]
+
+    - [[file:5_002e3.xhtml#g_t5_002e3_002e1][5.3.1 Memory as Vectors]]
+    - [[file:5_002e3.xhtml#g_t5_002e3_002e2][5.3.2 Maintaining the Illusion of Infinite Memory]]
+
+  - [[file:5_002e4.xhtml#g_t5_002e4][5.4 The Explicit-Control Evaluator]]
+
+    - [[file:5_002e4.xhtml#g_t5_002e4_002e1][5.4.1 The Core of the Explicit-Control Evaluator]]
+    - [[file:5_002e4.xhtml#g_t5_002e4_002e2][5.4.2 Sequence Evaluation and Tail Recursion]]
+    - [[file:5_002e4.xhtml#g_t5_002e4_002e3][5.4.3 Conditionals, Assignments, and Definitions]]
+    - [[file:5_002e4.xhtml#g_t5_002e4_002e4][5.4.4 Running the Evaluator]]
+
+  - [[file:5_002e5.xhtml#g_t5_002e5][5.5 Compilation]]
+
+    - [[file:5_002e5.xhtml#g_t5_002e5_002e1][5.5.1 Structure of the Compiler]]
+    - [[file:5_002e5.xhtml#g_t5_002e5_002e2][5.5.2 Compiling Expressions]]
+    - [[file:5_002e5.xhtml#g_t5_002e5_002e3][5.5.3 Compiling Combinations]]
+    - [[file:5_002e5.xhtml#g_t5_002e5_002e4][5.5.4 Combining Instruction Sequences]]
+    - [[file:5_002e5.xhtml#g_t5_002e5_002e5][5.5.5 An Example of Compiled Code]]
+    - [[file:5_002e5.xhtml#g_t5_002e5_002e6][5.5.6 Lexical Addressing]]
+    - [[file:5_002e5.xhtml#g_t5_002e5_002e7][5.5.7 Interfacing Compiled Code to the Evaluator]]
+
+- [[file:References.xhtml#References][References]]
+- [[file:Exercises.xhtml#Exercises][List of Exercises]]
+- [[file:Figures.xhtml#Figures][List of Figures]]
+- [[file:Term-Index.xhtml#Term-Index][Term Index]]
+- [[file:Colophon.xhtml#Colophon][Colophon]]
+
+<<Top>>
+Next: [[file:UTF.xhtml#UTF][UTF]], Prev: [[../index.xhtml][(dir)]], Up: [[../index.xhtml][(dir)]]   [[[#SEC_Contents][Contents]]]
+
+* Top
+  :PROPERTIES:
+  :CUSTOM_ID: top
+  :CLASS: node-heading
+  :END:
+
+Next: [[file:UTF.xhtml#UTF][UTF]], Prev: [[../index.xhtml][(dir)]], Up: [[../index.xhtml][(dir)]]   [[[#SEC_Contents][Contents]]]
+
+[[#pagebottom][⇣]]<<pagebottom>>
